@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
@@ -6,9 +6,9 @@ import User from "@/model/User";
 import Thread from "@/model/Thread";
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { threadId: string } }
-) {
+): Promise<NextResponse> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,6 +21,7 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
     const thread = await Thread.findOne({
       threadId: params.threadId,
       userId: user._id,
@@ -32,14 +33,15 @@ export async function GET(
 
     return NextResponse.json(thread.messages);
   } catch (error) {
+    console.error("GET /threads/[threadId] error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { threadId: string } }
-) {
+): Promise<NextResponse> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -59,11 +61,8 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: "Thread deleted" }, { status: 200 });
-  } catch (error: unknown) {
-    if (typeof error === "string") {
-      return "check";
-    } else {
-      return NextResponse.json({ error: "Server error" }, { status: 500 });
-    }
+  } catch (error) {
+    console.error("DELETE /threads/[threadId] error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
