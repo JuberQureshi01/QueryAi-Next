@@ -28,7 +28,11 @@ export async function GET() {
     }));
 
     return NextResponse.json(filteredThreads);
-  } catch (error) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error:unknown) {
+    if (typeof error === "string") {
+      return "check";
+    } else {
+      return NextResponse.json({ error: "Server error" }, { status: 500 });
+    }
   }
 }

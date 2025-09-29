@@ -62,14 +62,18 @@ export default function ChatInput() {
         ]);
         setNewChat(false);
       }
-    } catch (error) {
-      setPrevChats((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Failed to connect to the server.",
-        },
-      ]);
+    } catch (err: unknown) {
+      if (typeof err === "string") {
+        console.log("Something went wrong.");
+      } else {
+        setPrevChats((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "Failed to connect to the server.",
+          },
+        ]);
+      }
     } finally {
       setLoading(false);
     }

@@ -31,10 +31,11 @@ export async function POST(request: Request) {
       { message: "User registered successfully" },
       { status: 201 }
     );
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    if (error === "string") {
+      console.log(error);
+    } else {
+      return NextResponse.json({ error: "Server error" }, { status: 500 });
+    }
   }
 }

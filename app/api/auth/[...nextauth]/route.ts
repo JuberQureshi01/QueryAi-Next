@@ -1,4 +1,3 @@
-
 import NextAuth from "next-auth";
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -19,22 +18,20 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials: any) {
+      async authorize(credentials: Record<string, string> | undefined) {
         await dbConnect();
-        try {
-          const user = await User.findOne({ email: credentials.email });
-          if (!user) return null;
+        if (!credentials) return null;
 
-          if (!user.password) return null;
+        const user = await User.findOne({ email: credentials.email });
+        if (!user || !user.password) return null;
 
-          const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
-          if (isPasswordCorrect) return user;
+        const isPasswordCorrect = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        if (!isPasswordCorrect) return null;
 
-          return null;
-        } catch (err) {
-          console.error("Authorize error:", err);
-          return null;
-        }
+        return user;
       },
     }),
   ],
@@ -56,17 +53,19 @@ export const authOptions: NextAuthOptions = {
 
     async jwt({ token, user }) {
       if (user) {
-        token._id = (user as any)._id?.toString();
+        token._id = user._id as string;
+        token.name = user.name;
         token.email = user.email;
+        token.image = user.image;
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token) {
-        (session.user as any)._id = token._id;
-        (session.user as any).email = token.email;
-      }
+      session.user._id = token._id as string;
+      session.user.name = token.name as string;
+      session.user.email = token.email as string;
+      session.user.image = token.image as string;
       return session;
     },
   },

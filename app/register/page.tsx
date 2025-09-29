@@ -24,8 +24,12 @@ export default function RegisterPage() {
       if (res.status === 200) {
         router.push("/login");
       }
-    } catch (err) {
-      setError("Something went wrong.");
+    } catch (err: unknown) {
+      if (typeof err === "string") {
+        setError("Something went wrong.");
+      } else {
+        setError("Something went wrong.");
+      }
     }
   };
 
