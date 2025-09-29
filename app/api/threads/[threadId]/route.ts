@@ -5,10 +5,17 @@ import dbConnect from "@/lib/dbConnect";
 import User from "@/model/User";
 import Thread from "@/model/Thread";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { threadId: string } }
-): Promise<NextResponse> {
+// Define the context type for clarity
+type RouteContext = {
+  params: {
+    threadId: string;
+  };
+};
+
+export async function GET(request: NextRequest, context: RouteContext) {
+  // --- FIX: Destructure params from the context object ---
+  const { threadId } = context.params;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -23,7 +30,8 @@ export async function GET(
     }
 
     const thread = await Thread.findOne({
-      threadId: params.threadId,
+      // --- FIX: Use the destructured threadId ---
+      threadId: threadId,
       userId: user._id,
     });
 
@@ -38,10 +46,10 @@ export async function GET(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { threadId: string } }
-): Promise<NextResponse> {
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  // --- FIX: Destructure params from the context object ---
+  const { threadId } = context.params;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,7 +64,8 @@ export async function DELETE(
     }
 
     await Thread.findOneAndDelete({
-      threadId: params.threadId,
+      // --- FIX: Use the destructured threadId ---
+      threadId: threadId,
       userId: user._id,
     });
 
@@ -66,3 +75,4 @@ export async function DELETE(
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
