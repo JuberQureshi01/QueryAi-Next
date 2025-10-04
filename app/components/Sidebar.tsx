@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { SquarePen, PanelLeft, LogOut } from "lucide-react";
 import ThreadsList from "./ThreadsList"; 
+import toast from "react-hot-toast";
 export default function Sidebar() {
   const {
     currThreadId,
@@ -28,6 +29,16 @@ export default function Sidebar() {
     setPrevChats([]);
     setSidebarOpen(false);
     router.push("/chat");
+  };
+  const handleLogout = async () => {
+    signOut();
+    toast.success("Logout Successfull", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
   };
 
   return (
@@ -80,7 +91,7 @@ export default function Sidebar() {
 
         <div className="p-4 border-t border-white/20">
           <button
-            onClick={() => signOut()}
+            onClick={handleLogout}
             className="flex items-center justify-between p-2.5 rounded-lg w-full hover:bg-white/5 transition-colors duration-200"
           >
             <span>Log Out</span>

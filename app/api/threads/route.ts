@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
@@ -8,7 +7,6 @@ import Thread from "@/model/Thread";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -21,18 +19,16 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const threads = await Thread.find({ userId: user._id }).sort({ updatedAt: -1 });
-    const filteredThreads = threads.map(thread => ({
-        threadId: thread.threadId,
-        title: thread.title
-    }));
+    // Fetch all threads for the user, selecting only the necessary fields
+    // and sorting by the most recently created
+    const threads = await Thread.find({ userId: user._id })
+      .select("threadId title")
+      .sort({ createdAt: -1 });
 
-    return NextResponse.json(filteredThreads);
-  } catch (error:unknown) {
-    if (typeof error === "string") {
-      return "check";
-    } else {
-      return NextResponse.json({ error: "Server error" }, { status: 500 });
-    }
+    return NextResponse.json(threads);
+    
+  } catch (error) {
+    console.error("GET /api/threads error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

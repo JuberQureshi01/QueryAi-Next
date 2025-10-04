@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -24,6 +25,13 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Invalid email or password");
     } else {
+      toast.success("Successully Login", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
       router.push("/chat");
     }
   };

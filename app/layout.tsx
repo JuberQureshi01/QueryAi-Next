@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "./components/AuthProvider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "QueryAI",
-  description: "A full-stack  application that translates questions into answers using the Google Gemini API.",
+  description:
+    "A full-stack  application that translates questions into answers using the Google Gemini API.",
 };
 
 export default function RootLayout({
@@ -18,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-         <link rel="icon" href="/backlogo.ico" />
+        <link rel="icon" href="/backlogo.ico" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -28,7 +30,9 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Toaster position="top-right" />
+          {children}</AuthProvider>
       </body>
     </html>
   );

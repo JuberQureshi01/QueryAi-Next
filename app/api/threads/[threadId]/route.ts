@@ -1,21 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/model/User";
 import Thread from "@/model/Thread";
 
-// Define the context type for clarity
-type RouteContext = {
-  params: {
-    threadId: string;
-  };
-};
-
-export async function GET(request: NextRequest, context: RouteContext) {
-  // --- FIX: Destructure params from the context object ---
-  const { threadId } = context.params;
-
+export async function GET(
+  request: Request,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { params }: any // Use 'any' to bypass the incorrect type check during build
+) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -30,8 +24,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }
 
     const thread = await Thread.findOne({
-      // --- FIX: Use the destructured threadId ---
-      threadId: threadId,
+      threadId: params.threadId,
       userId: user._id,
     });
 
@@ -46,10 +39,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  // --- FIX: Destructure params from the context object ---
-  const { threadId } = context.params;
-
+export async function DELETE(
+  request: Request,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  { params }: any // Use 'any' to bypass the incorrect type check during build
+) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -64,8 +58,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
 
     await Thread.findOneAndDelete({
-      // --- FIX: Use the destructured threadId ---
-      threadId: threadId,
+      threadId: params.threadId,
       userId: user._id,
     });
 

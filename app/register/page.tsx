@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -21,7 +22,14 @@ export default function RegisterPage() {
         password,
       });
 
-      if (res.status === 200) {
+      if (res.status === 201) {
+        toast.success("Successully Register Login to continue ", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
         router.push("/login");
       }
     } catch (err: unknown) {
